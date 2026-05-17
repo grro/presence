@@ -1,4 +1,4 @@
-# Presence WebThing
+# Presence
 
 A device presence detection system that monitors network-connected devices using IP-based ping detection. 
 The system provides multiple interfaces for querying presence status, making it ideal for home automation,
@@ -12,9 +12,6 @@ occupancy detection, and AI integration.
   - **MCP Server**: Model Context Protocol support for AI/LLM integration with real-time push notifications
 - **Presence Aggregation**: Combine multiple devices into aggregate presence sensors (e.g., "anyone home")
 - **mDNS Service Discovery**: Automatic service registration for network discovery
-- **Real-time Notifications**: Push notifications to subscribed clients when presence state changes
-- **Flexible Configuration**: Configure monitored devices via command-line arguments
-- **Configurable Timeout**: Customize the absent threshold for each monitored device
 
 
 ## Docker
