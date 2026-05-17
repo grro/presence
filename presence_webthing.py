@@ -1,12 +1,7 @@
-import sys
-import logging
 import tornado.ioloop
-from typing import Dict
-from webthing import (MultipleThings, Property, Thing, Value, WebThingServer)
-from presence import Presence, IpPresence, Presences
+from webthing import (Property, Thing, Value)
+from presence import Presence
 from redzoo.math.display import duration
-from presence_web import PresenceWebServer
-from presence_mcp import PresenceMCPServer
 
 
 class PresenceThing(Thing):
@@ -95,44 +90,3 @@ class PresenceThing(Thing):
         self.elapsed_since_last_seen.notify_of_external_update(duration(self.presence.age_sec, 1))
         self.is_presence.notify_of_external_update(self.presence.is_presence)
 
-
-def run_server(description: str, port: int, name_address_map: Dict[str, str], timeout_sec :int):
-    if len(name_address_map) < 2:
-        presences = [IpPresence(dev_name, name_address_map[dev_name], timeout_sec) for dev_name in name_address_map.keys()]
-    else:
-        presences = [IpPresence(dev_name, name_address_map[dev_name], timeout_sec) for dev_name in name_address_map.keys()]
-        presences = [Presences("any", presences, timeout_sec)] + presences
-    shutters_tings = [PresenceThing(description, presence) for presence in presences]
-    web_server = PresenceWebServer(presences, port=port+1)
-    mcp_server = PresenceMCPServer("presence", port+2, presences)
-    server = WebThingServer(MultipleThings(shutters_tings, "presence"), port=port, disable_host_validation=True)
-    try:
-        logging.info('starting the server http://localhost:' + str(port) + " (absent threshold: " + duration(timeout_sec) + ")")
-        [presence.start() for presence in presences]
-        web_server.start()
-        mcp_server.start()
-        server.start()
-    except KeyboardInterrupt:
-        logging.info('stopping the server')
-        [presence.stop() for presence in presences]
-        web_server.stop()
-        mcp_server.stop()
-        server.stop()
-        logging.info('done')
-
-
-
-def parse_devices(config: str) -> Dict[str, str]:
-    name_address_map = {}
-    for device in config.split("&"):
-        name, address = device.split('=')
-        name_address_map[name.strip()] = address.strip()
-    return name_address_map
-
-
-if __name__ == '__main__':
-    logging.basicConfig(format='%(asctime)s %(name)-20s: %(levelname)-8s %(message)s', level=logging.INFO, datefmt='%Y-%m-%d %H:%M:%S')
-    logging.getLogger('tornado.access').setLevel(logging.ERROR)
-    logging.getLogger('urllib3.connectionpool').setLevel(logging.WARNING)
-    logging.getLogger('scapy.runtime').setLevel(logging.ERROR)
-    run_server("description", int(sys.argv[1]), parse_devices(sys.argv[2]), int(sys.argv[3]))
