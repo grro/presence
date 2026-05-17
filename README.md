@@ -18,7 +18,6 @@ occupancy detection, and AI integration.
 A Dockerfile is included for containerization:
 
 ```bash
-docker build -f presence .
 docker run --name presence --network host -e devices='Alice=192.168.1.100&Bob=192.168.1.101' grro/presence
 ```
 
