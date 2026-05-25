@@ -241,10 +241,8 @@ class PresenceMCPServer:
                     dead_sessions = set()
                     for session in self.active_sessions:
                         try:
-                            logger.info("[Server] Sende Update an Client...")
                             await session.send_resource_updated(TypeAdapter(AnyUrl).validate_python("sensor://presence/" + name))
                         except Exception as e:
-                            logger.warning("[Server] Client nicht mehr erreichbar: %s", e)
                             dead_sessions.add(session)
 
                     self.active_sessions.difference_update(dead_sessions)
