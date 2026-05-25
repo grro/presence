@@ -250,7 +250,12 @@ class PresenceMCPServer:
 
     async def __run(self) -> None:
         logger.info(f"MCP Server '{self.name}' running on http://{self.host}:{self.port}/sse")
-        await self.mcp.run_async(transport="sse", host=self.host, port=self.port)
+        await self.mcp.run_async(
+            transport="sse",
+            host=self.host,
+            port=self.port,
+            uvicorn_config={"access_log": False, "log_config": None}
+        )
 
 
     def start(self):
